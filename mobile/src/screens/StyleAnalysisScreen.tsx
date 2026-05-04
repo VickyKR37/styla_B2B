@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Linking,
@@ -14,7 +14,6 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { File, Paths } from 'expo-file-system';
 
-import ShareCard, { type ShareCardRef } from '../components/ShareCard';
 import { GOOGLE_PLAY_REVIEW_URL } from '../constants/externalLinks';
 import { useAuth } from '../../context/AuthContext';
 import { loadStyleAnalysis, saveStyleAnalysis } from '../../lib/styleAnalysisStorage';
@@ -158,7 +157,6 @@ export function StyleAnalysisScreen() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [restoredFromStorage, setRestoredFromStorage] = useState(false);
-  const shareCardRef = useRef<ShareCardRef>(null);
 
   const progress = useMemo(() => ((step + 1) / 4) * 100, [step]);
 
@@ -386,7 +384,7 @@ export function StyleAnalysisScreen() {
       }
       await Sharing.shareAsync(targetUri, {
         mimeType: 'application/pdf',
-        dialogTitle: 'Share client PDF',
+        dialogTitle: 'Save or send PDF',
         UTI: '.pdf',
       });
     } catch (e) {
@@ -439,13 +437,6 @@ export function StyleAnalysisScreen() {
           <Text style={styles.secondaryButtonText}>Leave a Review</Text>
         </Pressable>
 
-        <Pressable
-          style={[styles.reportShareButton, styles.reportReviewButton]}
-          onPress={() => void shareCardRef.current?.share()}
-        >
-          <Text style={styles.reportShareButtonText}>Share</Text>
-        </Pressable>
-
         <View style={styles.reportShell}>
           <ScrollView
             style={styles.reportScroll}
@@ -483,8 +474,6 @@ export function StyleAnalysisScreen() {
           </ScrollView>
         </View>
 
-        <ShareCard ref={shareCardRef} hideShareButton />
-
         <Pressable
           style={[
             styles.primaryButton,
@@ -505,13 +494,6 @@ export function StyleAnalysisScreen() {
           onPress={() => void onLeaveReview()}
         >
           <Text style={styles.secondaryButtonText}>Leave a Review</Text>
-        </Pressable>
-
-        <Pressable
-          style={[styles.reportShareButton, styles.reportReviewButton]}
-          onPress={() => void shareCardRef.current?.share()}
-        >
-          <Text style={styles.reportShareButtonText}>Share</Text>
         </Pressable>
       </ScrollView>
     );
@@ -867,24 +849,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignSelf: 'stretch',
     width: '100%',
-  },
-  reportShareButton: {
-    marginTop: 10,
-    alignSelf: 'stretch',
-    width: '100%',
-    borderRadius: 10,
-    backgroundColor: '#2A1F14',
-    borderWidth: 1,
-    borderColor: '#2A1F14',
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  reportShareButtonText: {
-    color: '#FAF7F2',
-    fontWeight: '900',
-    fontSize: 13,
-    letterSpacing: 0.3,
   },
   reportActionsRepeatTop: {
     marginTop: 14,

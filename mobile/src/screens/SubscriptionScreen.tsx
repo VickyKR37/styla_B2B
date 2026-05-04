@@ -75,7 +75,7 @@ export function SubscriptionScreen(_props: Props) {
         Alert.alert('You’re subscribed', 'Unlimited client reports are now included.');
       }
     } catch (e) {
-      Alert.alert('Checkout couldn’t open', e instanceof Error ? e.message : 'Please try again.');
+      Alert.alert('Checkout', e instanceof Error ? e.message : 'Please try again.');
     } finally {
       setCheckoutBusy(false);
       await refetch();

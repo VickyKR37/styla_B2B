@@ -62,7 +62,22 @@ Deno.serve(async (req) => {
 
   const stripe = new Stripe(stripeKey, { httpClient: Stripe.createFetchHttpClient() });
 
-  const returnUrl = Deno.env.get('STRIPE_PORTAL_RETURN_URL') ?? 'styla://subscription/manage';
+  const portalReturnExplicit = Deno.env.get('STRIPE_PORTAL_RETURN_URL')?.trim();
+  const origin = Deno.env.get('APP_PUBLIC_ORIGIN')?.trim().replace(/\/$/, '');
+  let returnUrl: string | undefined =
+    portalReturnExplicit?.startsWith('https://') ? portalReturnExplicit : undefined;
+  if (!returnUrl && origin?.startsWith('https://')) {
+    returnUrl = `${origin}/subscription/return?status=success`;
+  }
+  if (!returnUrl) {
+    return jsonResponse(
+      {
+        error:
+          'Billing Portal requires an https return URL. Set STRIPE_PORTAL_RETURN_URL or APP_PUBLIC_ORIGIN (same https site as Checkout return page). Stripe does not accept styla://.',
+      },
+      400,
+    );
+  }
 
   try {
     const portalSession = await stripe.billingPortal.sessions.create({

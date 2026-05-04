@@ -3,3 +3,7 @@
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+# Public Stripe return redirect → app deep link (no Authorization header).
+[functions.subscription-return]
+verify_jwt = false

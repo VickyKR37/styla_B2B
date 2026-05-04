@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -166,7 +167,8 @@ export function StyleAnalysisScreen() {
 
     async function restore() {
       if (!consultantAuthId) {
-        setRestoredFromStorage(true);
+        // Stay "not hydrated" until we have an auth id; avoids save effect running early with wrong flags.
+        setRestoredFromStorage(false);
         return;
       }
       const saved = await loadStyleAnalysis(consultantAuthId);
@@ -404,7 +406,12 @@ export function StyleAnalysisScreen() {
 
   if (report) {
     return (
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+      >
         <Text style={styles.reportTitle}>Style report</Text>
         <Text style={styles.reportClientLine}>Report for: {reportForLabel()}</Text>
         <Text style={styles.reportIntro}>
@@ -511,7 +518,12 @@ export function StyleAnalysisScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+      automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+    >
       <Text style={styles.title}>Client style report</Text>
       <Text style={styles.body}>
         Work through this questionnaire on behalf of your client. The narrative in the final report stays warm and
@@ -519,14 +531,18 @@ export function StyleAnalysisScreen() {
       </Text>
 
       <Text style={styles.clientNameLabel}>Client name</Text>
+      {!restoredFromStorage ? (
+        <Text style={styles.hydrationHint}>Loading saved draft…</Text>
+      ) : null}
       <TextInput
         style={styles.clientNameInput}
         value={clientDisplayName}
         onChangeText={setClientDisplayName}
         placeholder="Shown on the exported report"
         placeholderTextColor="rgba(148,163,184,0.75)"
-        editable={!report}
+        editable={restoredFromStorage && !report}
         autoCapitalize="words"
+        selectionColor="#a5b4fc"
       />
       <Text style={styles.clientNameHint}>Required before you generate the PDF.</Text>
 
@@ -898,6 +914,12 @@ const styles = StyleSheet.create({
     color: 'rgba(248,250,252,0.9)',
     fontSize: 13,
     fontWeight: '800',
+  },
+  hydrationHint: {
+    marginTop: 4,
+    color: '#94a3b8',
+    fontSize: 12,
+    fontStyle: 'italic',
   },
   clientNameInput: {
     marginTop: 8,

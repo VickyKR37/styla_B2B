@@ -16,6 +16,7 @@ import { File, Paths } from 'expo-file-system';
 
 import { GOOGLE_PLAY_REVIEW_URL } from '../constants/externalLinks';
 import { useAuth } from '../../context/AuthContext';
+import { syncGeneratedStyleReportToSupabase } from '../../lib/syncStyleReportToSupabase';
 import { loadStyleAnalysis, saveStyleAnalysis } from '../../lib/styleAnalysisStorage';
 import { generateLogicBasedReport } from '../features/styleAnalysis/generateLogicBasedReport';
 import type {
@@ -286,10 +287,29 @@ export function StyleAnalysisScreen() {
       return;
     }
 
+    if (!consultantAuthId) {
+      Alert.alert('Sign in needed', 'Sign in again to save this report.');
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const data = buildQuestionnaireData();
       const generated = generateLogicBasedReport(data);
+
+      const saved = await syncGeneratedStyleReportToSupabase({
+        consultantId: consultantAuthId,
+        clientDisplayName: clientDisplayName.trim(),
+        reportText: generated,
+        questionnaire: data,
+      });
+      if (!saved.ok) {
+        Alert.alert(
+          'Report generated — cloud save failed',
+          `${saved.message} Your report still appears here and in your device backup. Open My clients to try again later.`,
+        );
+      }
+
       setReport(generated);
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Could not generate this client report.';

@@ -5,12 +5,13 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
 import { useSubscription } from '../hooks/useSubscription';
 import { openReportPdfWithFreshUrl } from '../lib/openReportPdf';
+import { STYLE_ANALYSIS_REPORT_DATA_KIND } from '../../lib/syncStyleReportToSupabase';
 import { supabase } from '../../lib/supabase';
 import type { ClientRow, ReportRow } from '../types/clients';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ClientDetail'>;
 
-type ReportLite = Pick<ReportRow, 'id' | 'colour_season' | 'created_at' | 'pdf_url'>;
+type ReportLite = Pick<ReportRow, 'id' | 'colour_season' | 'created_at' | 'pdf_url' | 'report_data'>;
 
 export function ClientDetailScreen({ navigation, route }: Props) {
   const { clientId } = route.params;
@@ -59,7 +60,7 @@ export function ClientDetailScreen({ navigation, route }: Props) {
 
     const { data: rRows, error: rErr } = await supabase
       .from('reports')
-      .select('id, colour_season, created_at, pdf_url')
+      .select('id, colour_season, created_at, pdf_url, report_data')
       .eq('client_id', clientId)
       .eq('consultant_id', uid)
       .order('created_at', { ascending: false });
@@ -156,10 +157,12 @@ export function ClientDetailScreen({ navigation, route }: Props) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void onRefresh()} tintColor="#C4956A" />}
-        ListEmptyComponent={<Text style={styles.empty}>No reports yet. Add one to attach a PDF.</Text>}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No reports yet. Style analysis reports appear here after you generate them, or add a report with a PDF.</Text>
+        }
         renderItem={({ item }) => {
           const created = formatDate(item.created_at);
-          const season = item.colour_season?.trim() ? item.colour_season.trim() : 'No colour season';
+          const season = formatReportTitle(item);
           const opening = pdfOpeningId === item.id;
           const rowErr = pdfErrorId?.id === item.id ? pdfErrorId.message : null;
           return (
@@ -183,11 +186,27 @@ export function ClientDetailScreen({ navigation, route }: Props) {
         }}
       />
 
-      <Pressable style={styles.fab} onPress={() => navigation.navigate('AddReport', { clientId })}>
-        <Text style={styles.fabText}>Add report</Text>
+      <Pressable
+        style={[styles.fab, subLoading || !subActive ? styles.fabDisabled : null]}
+        disabled={subLoading || !subActive}
+        onPress={() => navigation.navigate('AddReport', { clientId })}
+      >
+        <Text style={styles.fabText}>{subLoading ? 'Checking access…' : 'Add report'}</Text>
       </Pressable>
     </View>
   );
+}
+
+function formatReportTitle(item: ReportLite): string {
+  const cs = item.colour_season?.trim();
+  if (cs) return cs;
+  const rd = item.report_data;
+  const kind =
+    rd && typeof rd === 'object' && rd !== null && 'kind' in rd && typeof (rd as { kind: unknown }).kind === 'string'
+      ? (rd as { kind: string }).kind
+      : null;
+  if (kind === STYLE_ANALYSIS_REPORT_DATA_KIND) return 'Style analysis report';
+  return 'No colour season';
 }
 
 function formatDate(iso: string): string {

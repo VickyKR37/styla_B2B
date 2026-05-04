@@ -207,7 +207,7 @@ export function StyleAnalysisScreen() {
     return true;
   }
   function setAnswer<K extends keyof QuestionnaireFormState>(key: K, value: QuestionnaireFormState[K]) {
-    setAnswers((prev) => ({ ...prev, [key]: value }));
+    setAnswers((prev: QuestionnaireFormState) => ({ ...prev, [key]: value }));
   }
 
   function validateCurrentStep(): boolean {
@@ -278,7 +278,7 @@ export function StyleAnalysisScreen() {
     }
 
     if (step < 3) {
-      setStep((prev) => ((prev + 1) as Step));
+      setStep((prev: Step) => ((prev + 1) as Step));
       return;
     }
 
@@ -301,7 +301,7 @@ export function StyleAnalysisScreen() {
 
   function onBack() {
     if (report) return;
-    if (step > 0) setStep((prev) => ((prev - 1) as Step));
+    if (step > 0) setStep((prev: Step) => ((prev - 1) as Step));
   }
 
   function escapeHtml(rawText: string): string {
@@ -443,7 +443,7 @@ export function StyleAnalysisScreen() {
             contentContainerStyle={styles.reportScrollContent}
             nestedScrollEnabled
           >
-            {report.split('\n').map((rawLine, index) => {
+            {report.split('\n').map((rawLine: string, index: number) => {
               const line = rawLine.trim();
               if (!line) {
                 return <View key={`space-${index}`} style={styles.reportSpacer} />;
@@ -611,9 +611,6 @@ export function StyleAnalysisScreen() {
       {step === 2 ? (
         <View style={styles.stepBlock}>
           <Text style={styles.questionLabel}>Wrist Circumference</Text>
-          <Text style={styles.questionHint}>
-            Have the client measure the diameter of the smallest part of her wrist, or help her measure it.
-          </Text>
           <View style={styles.chipRow}>
             {scaleOptions.wrist.map((opt) => (
               <OptionChip

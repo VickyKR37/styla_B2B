@@ -38,6 +38,11 @@ export function HomeScreen({ navigation }: Props) {
           Use Styla to capture client measurements and export style reports you can hand to your clients.
         </Text>
 
+        <Pressable style={styles.cardMuted} onPress={() => navigation.navigate('ClientList')}>
+          <Text style={styles.cardTitle}>My clients</Text>
+          <Text style={styles.cardBody}>View and manage your saved clients and attach colour-season PDF reports.</Text>
+        </Pressable>
+
         <Pressable style={styles.card} onPress={openStyleAnalysis}>
           <Text style={styles.cardTitle}>New client style report</Text>
           <Text style={styles.cardBody}>
@@ -100,6 +105,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 14,
     lineHeight: 20,
+  },
+  cardMuted: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 14,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(148,163,184,0.2)',
   },
   card: {
     borderRadius: 16,

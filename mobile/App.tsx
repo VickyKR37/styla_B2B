@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -10,10 +10,13 @@ import { navigationRef } from './navigationRef';
 import { LoginScreen } from './screens/auth/LoginScreen';
 import { SignupScreen } from './screens/auth/SignupScreen';
 import { LegalLinksFooter } from './src/components/LegalLinksFooter';
-import { FAQ_URL } from './src/constants/externalLinks';
 import { AboutScreen } from './src/screens/AboutScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { PaymentScreen } from './src/screens/PaymentScreen';
+import { AddClientScreen } from './src/screens/AddClientScreen';
+import { AddReportScreen } from './src/screens/AddReportScreen';
+import { ClientDetailScreen } from './src/screens/ClientDetailScreen';
+import { ClientListScreen } from './src/screens/ClientListScreen';
 import { StyleAnalysisScreen } from './src/screens/StyleAnalysisScreen';
 
 export type RootStackParamList = {
@@ -21,6 +24,10 @@ export type RootStackParamList = {
   About: undefined;
   StyleAnalysis: undefined;
   Payment: undefined;
+  ClientList: undefined;
+  AddClient: undefined;
+  ClientDetail: { clientId: string };
+  AddReport: { clientId: string };
 };
 
 export type AuthStackParamList = {
@@ -58,6 +65,10 @@ function AppNavigator() {
         options={{ title: 'Client style report' }}
       />
       <AppStack.Screen name="Payment" component={PaymentScreen} options={{ title: 'Billing' }} />
+      <AppStack.Screen name="ClientList" component={ClientListScreen} options={{ title: 'My clients' }} />
+      <AppStack.Screen name="AddClient" component={AddClientScreen} options={{ title: 'New client' }} />
+      <AppStack.Screen name="ClientDetail" component={ClientDetailScreen} options={{ title: 'Client' }} />
+      <AppStack.Screen name="AddReport" component={AddReportScreen} options={{ title: 'New report' }} />
     </AppStack.Navigator>
   );
 }

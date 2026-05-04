@@ -8,6 +8,10 @@ export type RootNavigationParamList = {
   Home: undefined;
   StyleAnalysis: undefined;
   Payment: undefined;
+  ClientList: undefined;
+  AddClient: undefined;
+  ClientDetail: { clientId: string };
+  AddReport: { clientId: string };
 };
 
 export const navigationRef = createNavigationContainerRef<RootNavigationParamList>();

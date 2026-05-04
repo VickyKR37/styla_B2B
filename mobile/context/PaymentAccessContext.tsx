@@ -4,15 +4,10 @@ import type { PropsWithChildren } from 'react';
 
 import { useAuth } from './AuthContext';
 
-type FeatureKey = 'style' | 'colour';
-type PaymentPlan = 'style' | 'colour' | 'both';
-
 type PaymentAccessValue = {
   hasStyleAccess: boolean;
-  hasColourAccess: boolean;
   loading: boolean;
-  hasAccessFor: (feature: FeatureKey) => boolean;
-  completePayment: (plan: PaymentPlan) => Promise<void>;
+  completePayment: () => Promise<void>;
 };
 
 /** Legacy device-wide key; migrated per-user on first load after login. */
@@ -29,7 +24,6 @@ export function PaymentAccessProvider({ children }: PropsWithChildren) {
   const userId = user?.id ?? null;
 
   const [hasStyleAccess, setHasStyleAccess] = useState(false);
-  const [hasColourAccess, setHasColourAccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +33,6 @@ export function PaymentAccessProvider({ children }: PropsWithChildren) {
       setLoading(true);
       if (!userId) {
         setHasStyleAccess(false);
-        setHasColourAccess(false);
         if (!cancelled) setLoading(false);
         return;
       }
@@ -59,17 +52,14 @@ export function PaymentAccessProvider({ children }: PropsWithChildren) {
 
         if (stored) {
           const parsed = JSON.parse(stored) as { hasStyleAccess?: boolean; hasColourAccess?: boolean };
-          setHasStyleAccess(Boolean(parsed.hasStyleAccess));
-          setHasColourAccess(Boolean(parsed.hasColourAccess));
+          /** Treat legacy colour purchases as unlocking style-only access now that colour analysis was removed. */
+          const style = Boolean(parsed.hasStyleAccess) || Boolean(parsed.hasColourAccess);
+          setHasStyleAccess(style);
         } else {
           setHasStyleAccess(false);
-          setHasColourAccess(false);
         }
       } catch {
-        if (!cancelled) {
-          setHasStyleAccess(false);
-          setHasColourAccess(false);
-        }
+        if (!cancelled) setHasStyleAccess(false);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -81,43 +71,21 @@ export function PaymentAccessProvider({ children }: PropsWithChildren) {
     };
   }, [userId]);
 
-  const completePayment = useCallback(
-    async (plan: PaymentPlan) => {
-      if (!userId) {
-        throw new Error('You must be logged in to complete payment.');
-      }
-      let nextStyle = false;
-      let nextColour = false;
-      setHasStyleAccess((was) => {
-        nextStyle = was || plan === 'style' || plan === 'both';
-        return nextStyle;
-      });
-      setHasColourAccess((was) => {
-        nextColour = was || plan === 'colour' || plan === 'both';
-        return nextColour;
-      });
-      await AsyncStorage.setItem(
-        userStorageKey(userId),
-        JSON.stringify({ hasStyleAccess: nextStyle, hasColourAccess: nextColour }),
-      );
-    },
-    [userId],
-  );
-
-  const hasAccessFor = useCallback(
-    (feature: FeatureKey) => (feature === 'style' ? hasStyleAccess : hasColourAccess),
-    [hasStyleAccess, hasColourAccess],
-  );
+  const completePayment = useCallback(async () => {
+    if (!userId) {
+      throw new Error('You must be logged in to complete payment.');
+    }
+    setHasStyleAccess(true);
+    await AsyncStorage.setItem(userStorageKey(userId), JSON.stringify({ hasStyleAccess: true }));
+  }, [userId]);
 
   const value = useMemo<PaymentAccessValue>(
     () => ({
       hasStyleAccess,
-      hasColourAccess,
       loading,
-      hasAccessFor,
       completePayment,
     }),
-    [completePayment, hasAccessFor, hasColourAccess, hasStyleAccess, loading],
+    [completePayment, hasStyleAccess, loading],
   );
 
   return <PaymentAccessContext.Provider value={value}>{children}</PaymentAccessContext.Provider>;

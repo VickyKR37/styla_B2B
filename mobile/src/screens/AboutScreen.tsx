@@ -69,8 +69,8 @@ export function AboutScreen(_props: Props) {
 
       <Text style={[styles.h2, styles.sectionSpacer]}>App description</Text>
       <Text style={styles.body}>
-        Styla is your personal colour and style analysis tool. Discover your unique colour season, receive a
-        personalised palette, and unlock style recommendations tailored just for you.
+        Styla is your personal style analysis tool. Answer a short questionnaire and receive style
+        recommendations tailored to you.
       </Text>
 
       <Text style={[styles.h2, styles.sectionSpacer]}>Support</Text>

@@ -98,7 +98,7 @@ async function shareImageWithSystemSheet(fileUri: string) {
     try {
       await Share.share({
         url: fileUri,
-        message: 'Check out Styla — colour and style analysis app',
+        message: 'Check out Styla — style analysis app',
       });
       return;
     } catch (e) {
@@ -192,11 +192,12 @@ const ShareCard = forwardRef<ShareCardRef, ShareCardProps>(function ShareCard(
             </View>
 
             <Text style={styles.headline}>
-              "I finally know my colours — and how to dress my shape."
+              "I finally understand how to dress my shape."
             </Text>
 
             <Text style={styles.subCopy}>
-              Got my personalised colour season and body shape analysis — the kind that normally costs £400+ with a stylist. Done in minutes, on my phone.
+              Got my personalised body shape style analysis — the kind that normally costs £400+ with a stylist.
+              Done in minutes, on my phone.
             </Text>
 
             <View style={styles.divider} />
@@ -207,7 +208,7 @@ const ShareCard = forwardRef<ShareCardRef, ShareCardProps>(function ShareCard(
               </View>
               <View>
                 <Text style={styles.appName}>Styla</Text>
-                <Text style={styles.appTagline}>Colour & Style Analysis App</Text>
+                <Text style={styles.appTagline}>Style Analysis App</Text>
               </View>
             </View>
 

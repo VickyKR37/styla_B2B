@@ -6,9 +6,8 @@ export type RootNavigationParamList = {
   Signup: undefined;
   About: undefined;
   Home: undefined;
-  ColourAnalysis: undefined;
   StyleAnalysis: undefined;
-  Payment: { target: 'StyleAnalysis' | 'ColourAnalysis' | 'Bundle' };
+  Payment: undefined;
 };
 
 export const navigationRef = createNavigationContainerRef<RootNavigationParamList>();

@@ -9,29 +9,15 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export function HomeScreen({ navigation }: Props) {
   const { signOut } = useAuth();
-  const { hasAccessFor, loading } = usePaymentAccess();
+  const { hasStyleAccess, loading } = usePaymentAccess();
 
   function openStyleAnalysis() {
     if (loading) return;
-    if (hasAccessFor('style')) {
+    if (hasStyleAccess) {
       navigation.navigate('StyleAnalysis');
       return;
     }
-    navigation.navigate('Payment', { target: 'StyleAnalysis' });
-  }
-
-  function openColourAnalysis() {
-    if (loading) return;
-    if (hasAccessFor('colour')) {
-      navigation.navigate('ColourAnalysis');
-      return;
-    }
-    navigation.navigate('Payment', { target: 'ColourAnalysis' });
-  }
-
-  function openBundleOffer() {
-    if (loading) return;
-    navigation.navigate('Payment', { target: 'Bundle' });
+    navigation.navigate('Payment');
   }
 
   return (
@@ -47,26 +33,18 @@ export function HomeScreen({ navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.subtitle}>Choose a feature to continue (payment required).</Text>
+        <Text style={styles.subtitle}>Style analysis (payment required).</Text>
 
         <Pressable style={styles.card} onPress={openStyleAnalysis}>
           <Text style={styles.cardTitle}>Style analysis</Text>
-          <Text style={styles.cardBody}>Please note this analysis is designed only for women. Answer a few questions to get personalised style guidance. 
-          To answer the questions you'll need to wear something in which you can clearly see your shape, measuring tape, a straight, long stick (like a metre stick) and a full length mirror. Please answer the questions accurately the first time because you won't be able to edit your answers once you have received your report.</Text>
+          <Text style={styles.cardBody}>
+            Please note this analysis is designed only for women. Answer a few questions to get personalised
+            style guidance. To answer the questions you'll need to wear something in which you can clearly see
+            your shape, measuring tape, a straight, long stick (like a metre stick) and a full length mirror.
+            Please answer the questions accurately the first time because you won't be able to edit your answers
+            once you have received your report.
+          </Text>
           <Text style={styles.priceTag}>£19.99</Text>
-        </Pressable>
-
-        <Pressable style={[styles.card, styles.cardSpacer]} onPress={openColourAnalysis}>
-          <Text style={styles.cardTitle}>Colour analysis</Text>
-          <Text style={styles.cardBody}>Upload or take a photo to find your season and palette.</Text>
-          <Text style={styles.priceTag}>£6.99</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.bundleButton, pressed ? styles.bundleButtonPressed : null]}
-          onPress={openBundleOffer}
-        >
-          <Text style={styles.bundleButtonTitle}>Bundle offer</Text>
-          <Text style={styles.bundleButtonSubtitle}>Both analyses for £24.99</Text>
         </Pressable>
       </ScrollView>
     </View>
@@ -121,9 +99,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(148,163,184,0.25)',
   },
-  cardSpacer: {
-    marginTop: 12,
-  },
   cardTitle: {
     color: '#f8fafc',
     fontSize: 18,
@@ -141,29 +116,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-  bundleButton: {
-    marginTop: 14,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: 'rgba(196, 149, 106, 0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(196, 149, 106, 0.55)',
-    alignItems: 'center',
-  },
-  bundleButtonPressed: {
-    opacity: 0.88,
-  },
-  bundleButtonTitle: {
-    color: '#f8fafc',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  bundleButtonSubtitle: {
-    color: '#C4956A',
-    marginTop: 4,
-    fontSize: 14,
-    fontWeight: '700',
-  },
 });
-

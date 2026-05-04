@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,48 +17,24 @@ import { usePaymentAccess } from '../../context/PaymentAccessContext';
 import { supabase } from '../../lib/supabase';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Payment'>;
-type Plan = 'style' | 'colour' | 'both';
 
-const PRICES: Record<Plan, string> = {
-  style: '£19.99',
-  colour: '£6.99',
-  both: '£24.99',
-};
+const PRICE = '£19.99';
 const WAIVER_TEXT =
   'I agree that my digital content will be delivered immediately and I understand that I waive my 14-day right to cancel once delivery begins.';
 
 const INVALID_CODE_MESSAGE = "That code isn't valid. Please check and try again.";
 
-export function PaymentScreen({ navigation, route }: Props) {
+export function PaymentScreen({ navigation }: Props) {
   const { completePayment } = usePaymentAccess();
   const { user } = useAuth();
-  const [selectedPlan, setSelectedPlan] = useState<Plan>(() => {
-    if (route.params.target === 'Bundle') return 'both';
-    return route.params.target === 'StyleAnalysis' ? 'style' : 'colour';
-  });
   const [submitting, setSubmitting] = useState(false);
   const [waiverAccepted, setWaiverAccepted] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [applyingDiscount, setApplyingDiscount] = useState(false);
 
-  const destinationTitle = useMemo(() => {
-    if (route.params.target === 'Bundle') return 'Style & Colour analyses';
-    return route.params.target === 'StyleAnalysis' ? 'Style Analysis' : 'Colour Analysis';
-  }, [route.params.target]);
-
   function navigateAfterPurchase() {
-    if (route.params.target === 'Bundle') {
-      if (selectedPlan === 'both') {
-        navigation.replace('Home');
-      } else if (selectedPlan === 'style') {
-        navigation.replace('StyleAnalysis');
-      } else {
-        navigation.replace('ColourAnalysis');
-      }
-    } else {
-      navigation.replace(route.params.target);
-    }
+    navigation.replace('StyleAnalysis');
   }
 
   async function logConsent(orderId: string) {
@@ -79,11 +55,11 @@ export function PaymentScreen({ navigation, route }: Props) {
     if (!waiverAccepted) return;
     setSubmitting(true);
     try {
-      const orderId = `order_${Date.now()}_${selectedPlan}`;
+      const orderId = `order_${Date.now()}_style`;
       if (!user?.id) {
         throw new Error('You must be logged in to complete payment.');
       }
-      await completePayment(selectedPlan);
+      await completePayment();
       await logConsent(orderId);
       navigateAfterPurchase();
     } catch (e) {
@@ -148,8 +124,8 @@ export function PaymentScreen({ navigation, route }: Props) {
         }
       }
 
-      await completePayment(selectedPlan);
-      const orderId = `beta_${Date.now()}_${selectedPlan}_${row.id}`;
+      await completePayment();
+      const orderId = `beta_${Date.now()}_style_${row.id}`;
       await logConsent(orderId);
 
       Alert.alert('Success', 'Beta code applied — enjoy your free analysis!', [
@@ -171,31 +147,12 @@ export function PaymentScreen({ navigation, route }: Props) {
       keyboardShouldPersistTaps="handled"
     >
       <Text style={styles.title}>Payment required</Text>
-      <Text style={styles.subtitle}>Choose a payment option to access {destinationTitle}.</Text>
+      <Text style={styles.subtitle}>Complete payment to access Style Analysis.</Text>
 
-      <Pressable
-        style={[styles.optionCard, selectedPlan === 'style' ? styles.optionCardSelected : null]}
-        onPress={() => setSelectedPlan('style')}
-      >
+      <View style={[styles.optionCard, styles.optionCardSelected]}>
         <Text style={styles.optionTitle}>Style Analysis</Text>
-        <Text style={styles.optionPrice}>{PRICES.style}</Text>
-      </Pressable>
-
-      <Pressable
-        style={[styles.optionCard, selectedPlan === 'colour' ? styles.optionCardSelected : null]}
-        onPress={() => setSelectedPlan('colour')}
-      >
-        <Text style={styles.optionTitle}>Colour Analysis</Text>
-        <Text style={styles.optionPrice}>{PRICES.colour}</Text>
-      </Pressable>
-
-      <Pressable
-        style={[styles.optionCard, selectedPlan === 'both' ? styles.optionCardSelected : null]}
-        onPress={() => setSelectedPlan('both')}
-      >
-        <Text style={styles.optionTitle}>Both analyses</Text>
-        <Text style={styles.optionPrice}>{PRICES.both}</Text>
-      </Pressable>
+        <Text style={styles.optionPrice}>{PRICE}</Text>
+      </View>
 
       <Pressable
         style={styles.waiverRow}
@@ -244,7 +201,7 @@ export function PaymentScreen({ navigation, route }: Props) {
         {submitting ? (
           <ActivityIndicator color="#FAF8F5" />
         ) : (
-          <Text style={styles.payButtonText}>Pay {PRICES[selectedPlan]}</Text>
+          <Text style={styles.payButtonText}>Pay {PRICE}</Text>
         )}
       </Pressable>
     </ScrollView>

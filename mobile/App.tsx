@@ -12,7 +12,6 @@ import { SignupScreen } from './screens/auth/SignupScreen';
 import { LegalLinksFooter } from './src/components/LegalLinksFooter';
 import { FAQ_URL } from './src/constants/externalLinks';
 import { AboutScreen } from './src/screens/AboutScreen';
-import { ColourAnalysisScreen } from './src/screens/ColourAnalysisScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { PaymentScreen } from './src/screens/PaymentScreen';
 import { StyleAnalysisScreen } from './src/screens/StyleAnalysisScreen';
@@ -20,9 +19,8 @@ import { StyleAnalysisScreen } from './src/screens/StyleAnalysisScreen';
 export type RootStackParamList = {
   Home: undefined;
   About: undefined;
-  ColourAnalysis: undefined;
   StyleAnalysis: undefined;
-  Payment: { target: 'StyleAnalysis' | 'ColourAnalysis' | 'Bundle' };
+  Payment: undefined;
 };
 
 export type AuthStackParamList = {
@@ -53,11 +51,6 @@ function AppNavigator() {
         name="About"
         component={AboutScreen}
         options={{ title: 'About', headerRight: () => null }}
-      />
-      <AppStack.Screen
-        name="ColourAnalysis"
-        component={ColourAnalysisScreen}
-        options={{ title: 'Colour Analysis' }}
       />
       <AppStack.Screen
         name="StyleAnalysis"

@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    /* white */
+    --foreground: 0 0% 0%;
+    /* black */
+
+    --card: 0 0% 100%;
+    /* white */
+    --card-foreground: 0 0% 0%;
+    /* black */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 0 0% 0%;
+    /* black */
+    --primary-foreground: 0 0% 100%;
+    /* white */
+
+    --secondary: 0 0% 85%;
+    /* light grey */
+    --secondary-foreground: 0 0% 0%;
+    /* black */
+
+    --muted: 0 0% 92%;
+    /* very light grey */
+    --muted-foreground: 0 0% 20%;
+    /* dark grey */
+
+    --accent: 0 0% 0%;
+    /* black */
+    --accent-foreground: 0 0% 100%;
+    /* white */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 0%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 0 0% 10%;
+    --chart-2: 0 0% 30%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 0 0% 70%;
+    --chart-5: 0 0% 90%;
+
+    /* Sidebar Specific colors - Light Theme */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 0 0% 0%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 0%;
+    --sidebar-ring: 0 0% 0%;
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    /* black */
+    --foreground: 0 0% 100%;
+    /* white */
+
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 25%;
+    --muted-foreground: 0 0% 75%;
+
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 100%;
+    --input: 0 0% 100%;
+    --ring: 0 0% 100%;
+
+    --chart-1: 0 0% 90%;
+    --chart-2: 0 0% 70%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 0 0% 30%;
+    --chart-5: 0 0% 10%;
+
+    /* Sidebar Specific colors - Dark Theme */
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 100%;
+    --sidebar-ring: 0 0% 100%;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex-grow: 1;
+  }
+
+  /* Markdown/Prose styling */
+  .prose {
+    h2 {
+      @apply text-2xl font-bold mb-4;
+      color: hsl(var(--secondary-foreground));
+    }
+
+    h3 {
+      @apply text-xl font-semibold mt-6 mb-2;
+      color: hsl(var(--primary));
+    }
+
+    ul {
+      @apply list-disc pl-5 space-y-1;
+    }
+
+    p,
+    li {
+      @apply text-base leading-relaxed;
+    }
+  }
+}

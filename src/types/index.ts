@@ -21,6 +21,9 @@ export interface QuestionnaireData {
 export interface UserReportData {
   recommendations: string;
   questionnaireData: QuestionnaireData;
-  recipientEmail?: string; 
-  generatedAtClient?: string; 
+  /** Where the consultant asked us to email the finished report (often the client inbox). */
+  recipientEmail?: string;
+  /** Optional display name for metadata if you later persist per-client rows server-side. */
+  clientDisplayName?: string;
+  generatedAtClient?: string;
 }

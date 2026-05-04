@@ -66,8 +66,8 @@ export default function PaymentPage() {
     setShowEmailInput(true);
     writeLocalJson(STORAGE_KEYS.PAYMENT_SUCCESS, data);
     toast({
-      title: "Payment Confirmed!",
-      description: "Your payment was successful. Please provide your email to receive the report.",
+      title: 'Consultant billing confirmed',
+      description: 'Add the delivery email where you want this client PDF copy sent.',
       duration: 3000,
     });
   };
@@ -85,9 +85,9 @@ export default function PaymentPage() {
       }
     } catch (e) {
       toast({
-        title: "Error",
-        description: "Could not retrieve questionnaire data. Please try again.",
-        variant: "destructive",
+        title: 'Could not retrieve client questionnaire',
+        description: 'Reopen the questionnaire in this browser session and try again.',
+        variant: 'destructive',
       });
       setIsGeneratingReport(false);
       return;
@@ -95,9 +95,9 @@ export default function PaymentPage() {
 
     if (!paymentDone) {
       toast({
-        title: "Payment Data Missing",
-        description: "Payment details were not found. Please complete the payment process again.",
-        variant: "destructive",
+        title: 'Payment missing',
+        description: 'We could not read the PayPal confirmation in this browser. Please complete billing again.',
+        variant: 'destructive',
       });
       setIsGeneratingReport(false);
       return;
@@ -111,8 +111,8 @@ export default function PaymentPage() {
         removeLocalKey(STORAGE_KEYS.PENDING_QUESTIONNAIRE);
         removeLocalKey(STORAGE_KEYS.PAYMENT_SUCCESS);
         toast({
-          title: "Report Generated!",
-          description: "Your personalised style report has been sent to your email.",
+          title: 'Report ready',
+          description: 'A copy of her personalised style narrative was emailed to the address you supplied.',
           duration: 5000,
         });
         router.push("/report");
@@ -142,9 +142,9 @@ export default function PaymentPage() {
             <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
               <span className="text-white text-3xl">✓</span>
             </div>
-            <CardTitle className="text-3xl font-bold text-primary mb-2">Payment Successful!</CardTitle>
+            <CardTitle className="text-3xl font-bold text-primary mb-2">Billing complete</CardTitle>
             <p className="text-lg text-muted-foreground">
-              Thank you for your purchase. Please enter your email to proceed to your personalised style report.
+              Enter the email where you (or your client) should receive the finished PDF copy and delivery message.
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -159,10 +159,10 @@ export default function PaymentPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-purple-200">Email Address</FormLabel>
+                      <FormLabel className="text-purple-200">Delivery email</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="your.email@example.com"
+                          placeholder="client@email.com or consultant@studio.com"
                           {...field}
                           className="bg-white/20 text-white placeholder:text-purple-200 border-purple-400 focus:border-purple-600"
                           type="email"
@@ -173,7 +173,8 @@ export default function PaymentPage() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isGeneratingReport}>
-                  {isGeneratingReport ? <LoadingSpinner size={20} className="mr-2" /> : <Send className="mr-2 h-4 w-4" />} Get My Report
+                  {isGeneratingReport ? <LoadingSpinner size={20} className="mr-2" /> : <Send className="mr-2 h-4 w-4" />}{' '}
+                  Email client report
                 </Button>
               </form>
             </Form>
@@ -199,7 +200,7 @@ export default function PaymentPage() {
         <div className="mb-8 text-center">
           <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-gray-700 text-sm font-medium">
             <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-            Final Step: Secure Payment
+            Final step: secure consultant billing
           </div>
         </div>
         <Card className="w-full max-w-md mx-auto">
@@ -207,8 +208,10 @@ export default function PaymentPage() {
             <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
               <span className="text-white text-2xl">💎</span>
             </div>
-            <CardTitle className="text-3xl font-bold text-primary mb-3">Complete Your Style Journey</CardTitle>
-            <p className="text-muted-foreground text-lg mb-6">Get your personalised style report</p>
+            <CardTitle className="text-3xl font-bold text-primary mb-3">Unlock client report export</CardTitle>
+            <p className="text-muted-foreground text-lg mb-6">
+              Finish payment to generate the warm, client-facing narrative you can deliver after your session.
+            </p>
           </CardHeader>
           <CardContent>
             <div className="bg-secondary/50 border border-border rounded-lg p-6 mb-8">

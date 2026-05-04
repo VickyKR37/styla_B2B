@@ -10,18 +10,18 @@ type PaymentAccessValue = {
   completePayment: () => Promise<void>;
 };
 
-/** Legacy device-wide key; migrated per-user on first load after login. */
+/** Legacy device-wide key; migrated per-consultant on first load after sign-in. */
 const STORAGE_KEY = 'styla_payment_access_v1';
 
-function userStorageKey(userId: string) {
-  return `${STORAGE_KEY}_${userId}`;
+function consultantStorageKey(consultantAuthId: string) {
+  return `${STORAGE_KEY}_${consultantAuthId}`;
 }
 
 const PaymentAccessContext = createContext<PaymentAccessValue | undefined>(undefined);
 
 export function PaymentAccessProvider({ children }: PropsWithChildren) {
   const { user } = useAuth();
-  const userId = user?.id ?? null;
+  const consultantAuthId = user?.id ?? null;
 
   const [hasStyleAccess, setHasStyleAccess] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -31,14 +31,14 @@ export function PaymentAccessProvider({ children }: PropsWithChildren) {
 
     async function restore() {
       setLoading(true);
-      if (!userId) {
+      if (!consultantAuthId) {
         setHasStyleAccess(false);
         if (!cancelled) setLoading(false);
         return;
       }
 
       try {
-        const key = userStorageKey(userId);
+        const key = consultantStorageKey(consultantAuthId);
         let stored = await AsyncStorage.getItem(key);
         if (!stored) {
           const legacy = await AsyncStorage.getItem(STORAGE_KEY);
@@ -69,15 +69,15 @@ export function PaymentAccessProvider({ children }: PropsWithChildren) {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [consultantAuthId]);
 
   const completePayment = useCallback(async () => {
-    if (!userId) {
-      throw new Error('You must be logged in to complete payment.');
+    if (!consultantAuthId) {
+      throw new Error('You must be signed in with a consultant account to complete checkout.');
     }
     setHasStyleAccess(true);
-    await AsyncStorage.setItem(userStorageKey(userId), JSON.stringify({ hasStyleAccess: true }));
-  }, [userId]);
+    await AsyncStorage.setItem(consultantStorageKey(consultantAuthId), JSON.stringify({ hasStyleAccess: true }));
+  }, [consultantAuthId]);
 
   const value = useMemo<PaymentAccessValue>(
     () => ({

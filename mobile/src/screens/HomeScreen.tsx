@@ -33,18 +33,20 @@ export function HomeScreen({ navigation }: Props) {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.subtitle}>Style analysis (payment required).</Text>
+        <Text style={styles.welcomeHeading}>Welcome, image consultant</Text>
+        <Text style={styles.subtitle}>
+          Use Styla to capture client measurements and export style reports you can hand to your clients.
+        </Text>
 
         <Pressable style={styles.card} onPress={openStyleAnalysis}>
-          <Text style={styles.cardTitle}>Style analysis</Text>
+          <Text style={styles.cardTitle}>New client style report</Text>
           <Text style={styles.cardBody}>
-            Please note this analysis is designed only for women. Answer a few questions to get personalised
-            style guidance. To answer the questions you'll need to wear something in which you can clearly see
-            your shape, measuring tape, a straight, long stick (like a metre stick) and a full length mirror.
-            Please answer the questions accurately the first time because you won't be able to edit your answers
-            once you have received your report.
+            This analysis is meant for women clients only. Run through the steps with your client present (or capture
+            verified details on her behalf). Your client will need a full-length mirror, a measuring tape, a straight
+            long stick (such as a metre stick), and fitted clothing that lets you see her shape clearly. Answers
+            lock in after the report is generated—you can’t edit them afterward, so double-check before proceeding.
           </Text>
-          <Text style={styles.priceTag}>£19.99</Text>
+          <Text style={styles.priceTag}>Professional access — £19.99</Text>
         </Pressable>
       </ScrollView>
     </View>
@@ -86,11 +88,18 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 16,
   },
+  welcomeHeading: {
+    color: '#f8fafc',
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: '800',
+  },
   subtitle: {
     color: '#cbd5e1',
     marginTop: 8,
     marginBottom: 16,
     fontSize: 14,
+    lineHeight: 20,
   },
   card: {
     borderRadius: 16,

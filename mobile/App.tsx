@@ -55,9 +55,9 @@ function AppNavigator() {
       <AppStack.Screen
         name="StyleAnalysis"
         component={StyleAnalysisScreen}
-        options={{ title: 'Style Analysis' }}
+        options={{ title: 'Client style report' }}
       />
-      <AppStack.Screen name="Payment" component={PaymentScreen} options={{ title: 'Payment' }} />
+      <AppStack.Screen name="Payment" component={PaymentScreen} options={{ title: 'Billing' }} />
     </AppStack.Navigator>
   );
 }
@@ -70,8 +70,8 @@ function AuthNavigator() {
         headerRight: () => aboutHeaderButton({ navigation }),
       })}
     >
-      <AuthStack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
-      <AuthStack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign up' }} />
+      <AuthStack.Screen name="Login" component={LoginScreen} options={{ title: 'Consultant sign-in' }} />
+      <AuthStack.Screen name="Signup" component={SignupScreen} options={{ title: 'Consultant account' }} />
       <AuthStack.Screen
         name="About"
         component={AboutScreen}

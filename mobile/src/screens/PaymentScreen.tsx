@@ -39,8 +39,8 @@ export function PaymentScreen({ navigation }: Props) {
 
   async function logConsent(orderId: string) {
     if (!user?.id) return;
-    const { error } = await supabase.from('consent_log').insert({
-      user_id: user.id,
+      const { error } = await supabase.from('consent_log').insert({
+        consultant_id: user.id,
       consented_at: new Date().toISOString(),
       waiver_text: WAIVER_TEXT,
       order_id: orderId,
@@ -57,7 +57,7 @@ export function PaymentScreen({ navigation }: Props) {
     try {
       const orderId = `order_${Date.now()}_style`;
       if (!user?.id) {
-        throw new Error('You must be logged in to complete payment.');
+        throw new Error('You must be signed in with a consultant account to complete checkout.');
       }
       await completePayment();
       await logConsent(orderId);
@@ -82,7 +82,7 @@ export function PaymentScreen({ navigation }: Props) {
       return;
     }
     if (!user?.id) {
-      setDiscountError('You must be logged in to apply a code.');
+      setDiscountError('You must be signed in with a consultant account to apply a code.');
       return;
     }
 
@@ -128,7 +128,7 @@ export function PaymentScreen({ navigation }: Props) {
       const orderId = `beta_${Date.now()}_style_${row.id}`;
       await logConsent(orderId);
 
-      Alert.alert('Success', 'Beta code applied — enjoy your free analysis!', [
+      Alert.alert('Success', 'Beta code applied — you can generate client style reports.', [
         { text: 'OK', onPress: () => navigateAfterPurchase() },
       ]);
     } catch (e) {
@@ -146,11 +146,13 @@ export function PaymentScreen({ navigation }: Props) {
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.title}>Payment required</Text>
-      <Text style={styles.subtitle}>Complete payment to access Style Analysis.</Text>
+      <Text style={styles.title}>Subscription</Text>
+      <Text style={styles.subtitle}>
+        Activate professional access so you can complete questionnaires and export style reports for your clients.
+      </Text>
 
       <View style={[styles.optionCard, styles.optionCardSelected]}>
-        <Text style={styles.optionTitle}>Style Analysis</Text>
+        <Text style={styles.optionTitle}>Professional style reporting</Text>
         <Text style={styles.optionPrice}>{PRICE}</Text>
       </View>
 

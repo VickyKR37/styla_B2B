@@ -229,12 +229,12 @@ export async function processPaymentAndGenerateReport(
   console.log("Server Action: processPaymentAndGenerateReport initiated.");
 
   if (!questionnaireData) {
-    const errorMsg = "Server Action: processPaymentAndGenerateReport ERRORED: No questionnaire data provided. This should have been caught client-side.";
+    const errorMsg = "Server Action: processPaymentAndGenerateReport ERRORED: No questionnaire data provided. This should have been caught in the consultant browser session.";
     console.error(errorMsg);
     return { success: false, message: "Questionnaire data is missing. Cannot generate report." };
   }
   if (!email || typeof email !== 'string' || !email.includes('@')) { // Added more robust email validation
-    const errorMsg = `Server Action: processPaymentAndGenerateReport ERRORED: Invalid or missing email provided: ${String(email)}. This should have been caught client-side.`;
+    const errorMsg = `Server Action: processPaymentAndGenerateReport ERRORED: Invalid or missing email provided: ${String(email)}. This should have been caught in the consultant browser session.`;
     console.error(errorMsg);
     return { success: false, message: "A valid email address is required to send the report." };
   }
@@ -329,10 +329,10 @@ export async function processPaymentAndGenerateReport(
         try { errorMessage = JSON.stringify(error); } catch { errorMessage = "Could not stringify critical error object."; }
     }
     console.error(`Server Action: Returning critical failure for ${email}: ${errorMessage}`);
-    // Return a simplified error message to the client
+    // Return a simplified error message to the consultant browser
     return {
       success: false,
-      message: "An unexpected server error occurred while generating your report. Please check server logs for details or try again later."
+      message: "An unexpected server error occurred while generating the client report. Check server logs or try again."
     };
   }
 }

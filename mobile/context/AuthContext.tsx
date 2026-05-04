@@ -50,7 +50,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
       // Ensure profile exists once a real authenticated session is available.
       if (nextSession?.user) {
-        await ensureProfile(nextSession.user.id, nextSession.user.email ?? null, nextSession.user.user_metadata?.full_name ?? null);
+        await ensureProfile(nextSession.user.id, nextSession.user.email ?? null, nextSession.user.user_metadata?.consultant_name ?? nextSession.user.user_metadata?.full_name ?? null);
       }
     });
 
@@ -67,11 +67,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }
 
-  async function ensureProfile(userId: string, email: string | null, fullName: string | null) {
+  async function ensureProfile(userId: string, email: string | null, consultantName: string | null) {
     const { error } = await supabase.from('profiles').upsert({
       id: userId,
       email,
-      full_name: fullName,
+      consultant_name: consultantName,
     });
     if (error) {
       // eslint-disable-next-line no-console
@@ -86,6 +86,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       options: {
         emailRedirectTo: getEmailRedirectTo(),
         data: {
+          consultant_name: fullName,
           full_name: fullName,
         },
       },

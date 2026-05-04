@@ -97,14 +97,14 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-primary">Your Personalised Style Report</CardTitle>
         <CardDescription>
-          {recipientEmail && <p className="text-sm mb-1">For: {recipientEmail}</p>}
-          Generated on: {displayDate}
+          {recipientEmail && <p className="text-sm mb-1 text-left">Delivered copy: {recipientEmail}</p>}
+          Exported: {displayDate}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-8">
         <section>
-          <h2 className="text-2xl font-bold text-secondary-foreground mb-4">Your Inputs Summary</h2>
+          <h2 className="text-2xl font-bold text-secondary-foreground mb-4">Client questionnaire snapshot</h2>
           <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
             <div>
               <h3 className="text-xl font-semibold text-primary mb-2">Line Analysis</h3>
@@ -146,7 +146,7 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
             />
           </ScrollArea>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Scroll down within the box above to read your full report.
+            Scroll inside the pane to review the full client-facing wording you can attach to her file.
           </p>
         </section>
       </CardContent>

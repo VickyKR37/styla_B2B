@@ -1,6 +1,6 @@
 /**
- * Browser persistence for questionnaire + report (survives tab close and return visits).
- * Use only from client components.
+ * Browser persistence for consultant questionnaire drafts + generated client reports.
+ * Use only from Next.js client components (`"use client"`).
  */
 
 export const STORAGE_KEYS = {
@@ -34,7 +34,7 @@ export function removeLocalKey(key: string): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem(key);
-  } catch {
-    /* ignore */
+  } catch (e) {
+    console.error(`Failed to remove localStorage key ${key}:`, e);
   }
 }

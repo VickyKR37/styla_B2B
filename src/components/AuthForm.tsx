@@ -25,12 +25,12 @@ export async function processPaymentAndGenerateReport(
   console.log("--- processPaymentAndGenerateReport action entered on server (no auth flow) ---");
 
   if (!questionnaireData) {
-    const errorMsg = "processPaymentAndGenerateReport ERRORED: No questionnaire data provided. This should have been caught client-side.";
+    const errorMsg = "processPaymentAndGenerateReport ERRORED: No questionnaire data provided. This should have been caught in the consultant browser session.";
     console.error(errorMsg);
     return { success: false, message: "Questionnaire data is missing. Cannot generate report." };
   }
   if (!email || !email.includes('@') || typeof email !== 'string') {
-    const errorMsg = `processPaymentAndGenerateReport ERRORED: Invalid or missing email provided: ${String(email)}. This should have been caught client-side.`;
+    const errorMsg = `processPaymentAndGenerateReport ERRORED: Invalid or missing email provided: ${String(email)}. This should have been caught in the consultant browser session.`;
     console.error(errorMsg);
     return { success: false, message: "A valid email address is required to send the report." };
   }

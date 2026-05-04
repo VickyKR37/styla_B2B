@@ -26,7 +26,7 @@ import { STORAGE_KEYS, readLocalJson, removeLocalKey, writeLocalJson } from "@/l
 // Schemas for individual form fields
 const lineAnswerSchema = z.string().min(1, "Please select an option.");
 const scaleAnswerSchema = z.string().min(1, "Please select an option.");
-const bodyShapeSchema = z.string().min(1, "Please select your body shape.");
+const bodyShapeSchema = z.string().min(1, "Select the client's confirmed body shape.");
 
 const combinedSchema = z.object({
   shoulders_answer: lineAnswerSchema,
@@ -126,10 +126,10 @@ const stepTitles = [
 ];
 
 const stepDescriptions = [
-  "Let's analyse the lines of your body structure (Shoulders, Waist, Hips).",
-  "Continuing our line analysis (Face, Jawline).",
-  "Let's determine your scale based on measurements.",
-  "Try holding a meter stick against your shoulders (or ask a friend to help) and let it hang straight down. Observe where it aligns with your hips to get a better idea of your body shape.",
+  'Assess how line reads through your client’s shoulders, waist, and hips.',
+  'Continue line analysis via her face and jawline.',
+  'Record scale cues from wrist, height, and shoe size observations.',
+  'Have her hold a metre stick beside one shoulder—or assist her—and let it hang straight so you can line it up relative to hip width.',
 ];
 
 type QuestionnaireDraft = {
@@ -321,7 +321,7 @@ export default function QuestionnaireForm({ onSubmit, initialData }: Questionnai
             {currentStep === 0 && (
               <>
                 {renderRadioGroup("shoulders_answer", "Shoulders:", lineOptions.shoulders)}
-                {renderRadioGroup("waist_answer", "Waist:", lineOptions.waist, "A defined waist is at least 8 inches narrower than the bust and hips, when looking at yourself straight on. Example: Bust: 38 inches, Waist: 28 inches, Hips: 38–40 inches")}
+                {renderRadioGroup("waist_answer", "Waist:", lineOptions.waist, "A defined waist is at least 8 inches narrower than bust and hips when she faces you squarely. Example: Bust 38\", Waist 28\", Hips 38–40\".")}
                 {renderRadioGroup("hips_answer", "Hips:", lineOptions.hips)}
               </>
             )}
@@ -344,7 +344,7 @@ export default function QuestionnaireForm({ onSubmit, initialData }: Questionnai
                 name="bodyShape"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel className="text-base font-semibold">Select Your Body Shape:</FormLabel>
+                    <FormLabel className="text-base font-semibold">Select your client’s body shape:</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -388,7 +388,7 @@ export default function QuestionnaireForm({ onSubmit, initialData }: Questionnai
         ) : (
           <Button type="button" onClick={handleNext} disabled={isLoading}>
             {isLoading ? <LoadingSpinner size={20} className="mr-2" /> : <Send className="mr-2 h-4 w-4" />}
-            Proceed to Get Report
+            Generate client report
           </Button>
         )}
       </CardFooter>

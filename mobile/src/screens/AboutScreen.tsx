@@ -69,8 +69,8 @@ export function AboutScreen(_props: Props) {
 
       <Text style={[styles.h2, styles.sectionSpacer]}>App description</Text>
       <Text style={styles.body}>
-        Styla is your personal style analysis tool. Answer a short questionnaire and receive style
-        recommendations tailored to you.
+        Styla supports image consultants: manage your consultant account on device, capture client questionnaires, and
+        export professional style narratives you can deliver to clients.
       </Text>
 
       <Text style={[styles.h2, styles.sectionSpacer]}>Support</Text>

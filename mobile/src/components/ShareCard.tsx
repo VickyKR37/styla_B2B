@@ -98,7 +98,7 @@ async function shareImageWithSystemSheet(fileUri: string) {
     try {
       await Share.share({
         url: fileUri,
-        message: 'Check out Styla — style analysis app',
+        message: 'Check out Styla — client style reports for image consultants',
       });
       return;
     } catch (e) {
@@ -208,7 +208,7 @@ const ShareCard = forwardRef<ShareCardRef, ShareCardProps>(function ShareCard(
               </View>
               <View>
                 <Text style={styles.appName}>Styla</Text>
-                <Text style={styles.appTagline}>Style Analysis App</Text>
+                <Text style={styles.appTagline}>Consultant tooling</Text>
               </View>
             </View>
 

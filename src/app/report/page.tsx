@@ -23,11 +23,11 @@ export default function ReportPage() {
       if (parsedData) {
         setReportData(parsedData);
       } else {
-        setError("No report data found. Please generate a report first.");
+        setError('No report payload found. Complete payment and generate a client report first.');
       }
     } catch (e) {
       console.error("Error loading report data from localStorage:", e);
-      setError("Failed to load your report data. It might be corrupted.");
+      setError('Failed to parse stored report data — try generating the report again.');
     } finally {
       setIsLoadingReport(false);
     }
@@ -48,7 +48,7 @@ export default function ReportPage() {
           </CardHeader>
           <CardContent>
             <Button asChild>
-              <Link href="/questionnaire">Start New Questionnaire</Link>
+              <Link href="/questionnaire">Capture a new client intake</Link>
             </Button>
           </CardContent>
         </Card>
@@ -62,11 +62,13 @@ export default function ReportPage() {
             <Card className="w-full max-w-md text-center">
             <CardHeader>
                 <CardTitle>Report Not Found</CardTitle>
-                <CardDescription>We couldn't find any report data. Please complete the questionnaire and payment process first.</CardDescription>
+                <CardDescription>
+                  Capture a client questionnaire and finish billing in this browser session to populate a report preview.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <Button asChild size="lg" className="w-full">
-                    <Link href="/questionnaire">Complete Questionnaire</Link>
+                    <Link href="/questionnaire">Resume client questionnaire</Link>
                 </Button>
             </CardContent>
             </Card>
@@ -87,8 +89,11 @@ export default function ReportPage() {
          <div className="flex items-center justify-center py-12">
            <Card className="w-full max-w-md text-center">
              <CardHeader>
-               <CardTitle>Report Unavailable</CardTitle>
-               <CardDescription>Your report could not be loaded at this time. It might still be generating or an error occurred.</CardDescription>
+              <CardTitle>Report unavailable</CardTitle>
+              <CardDescription>
+                The consultant session in this browser lost the generated file. Regenerate from the payment step or return
+                home.
+              </CardDescription>
              </CardHeader>
              <CardContent>
                <Button asChild>

@@ -1,5 +1,4 @@
-// This page is now obsolete due to removal of user authentication
-// Kept for routing integrity but directs users to main flow.
+// This route is legacy; core consultant auth lives in the Styla mobile app.
 'use client';
 
 import { Suspense } from 'react';
@@ -11,13 +10,13 @@ export default function LoginPage() {
     <Suspense fallback={<div>Loading...</div>}>
       <div className="flex flex-col items-center justify-center py-12">
         <div className="w-full max-w-md p-6 text-center bg-card rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-4">Login Not Required</h1>
+          <h1 className="text-2xl font-bold mb-4">Consultant sign-in (mobile)</h1>
           <p className="mb-6 text-muted-foreground">
-            Styla now operates without user accounts. You can directly complete the
-            questionnaire and receive your report.
+            Image consultants sign in on the Styla app with a consultant account. This site can still help you walk
+            through a client questionnaire in the browser when you need a quick sandbox.
           </p>
           <Button asChild>
-            <Link href="/questionnaire">Start Questionnaire</Link>
+            <Link href="/questionnaire">Open client questionnaire</Link>
           </Button>
         </div>
       </div>

@@ -14,7 +14,7 @@ const Header = () => {
         </Link>
         <nav className="flex items-center gap-2 sm:gap-4">
           <Link href="/questionnaire" className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary">
-            <DraftingCompass className="mr-2 h-4 w-4" /> Questionnaire
+            <DraftingCompass className="mr-2 h-4 w-4" /> Client questionnaire
           </Link>
         </nav>
       </div>

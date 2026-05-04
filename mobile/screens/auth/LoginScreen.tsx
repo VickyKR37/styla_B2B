@@ -32,7 +32,8 @@ export function LoginScreen({ navigation }: Props) {
         message = 'Please confirm your email first, then try logging in again.';
         setShowResendConfirmation(true);
       } else if (lower.includes('invalid login credentials')) {
-        message = 'Invalid email or password. Check your details or sign up first.';
+        message =
+          'Invalid email or password. Check your consultant details or register for a Styla consultant account.';
       }
       setError(message);
     } finally {
@@ -65,8 +66,8 @@ export function LoginScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
-      <Text style={styles.subtitle}>Sign in to continue</Text>
+      <Text style={styles.title}>Consultant workspace</Text>
+      <Text style={styles.subtitle}>Sign in to your Styla consultant account</Text>
 
       <TextInput
         style={styles.input}
@@ -104,7 +105,7 @@ export function LoginScreen({ navigation }: Props) {
       ) : null}
 
       <Pressable onPress={() => navigation.navigate('Signup')}>
-        <Text style={styles.linkText}>No account yet? Sign up</Text>
+        <Text style={styles.linkText}>New image consultant? Create an account</Text>
       </Pressable>
     </View>
   );

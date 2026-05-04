@@ -54,7 +54,7 @@ export function SignupScreen({ navigation }: Props) {
       await signUp(email.trim(), password, fullName.trim());
       setSuccessMessage('Account created. If confirmation is enabled, check your email before logging in.');
     } catch (e) {
-      const rawMessage = e instanceof Error ? e.message : 'Sign up failed';
+      const rawMessage = e instanceof Error ? e.message : 'Consultant registration failed';
       const lower = rawMessage.toLowerCase();
       let message = rawMessage;
       if (lower.includes('rate limit')) {
@@ -69,12 +69,12 @@ export function SignupScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create account</Text>
-      <Text style={styles.subtitle}>Join Styla</Text>
+      <Text style={styles.title}>Consultant onboarding</Text>
+      <Text style={styles.subtitle}>Create your professional Styla account for client style reporting</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Full name"
+        placeholder="Consultant name (consultant profile)"
         placeholderTextColor="#9C9A90"
         value={fullName}
         onChangeText={setFullName}
@@ -117,7 +117,11 @@ export function SignupScreen({ navigation }: Props) {
         onPress={handleSignup}
         disabled={submitting || cooldownSeconds > 0}
       >
-        {submitting ? <ActivityIndicator color="#FAF8F5" /> : <Text style={styles.buttonText}>Sign up</Text>}
+        {submitting ? (
+          <ActivityIndicator color="#FAF8F5" />
+        ) : (
+          <Text style={styles.buttonText}>Create consultant account</Text>
+        )}
       </Pressable>
       {cooldownSeconds > 0 ? <Text style={styles.cooldownText}>Try again in {cooldownSeconds}s</Text> : null}
 

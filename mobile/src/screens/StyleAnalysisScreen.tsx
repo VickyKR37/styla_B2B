@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import * as Print from 'expo-print';
@@ -147,10 +148,11 @@ function isReportHeading(line: string): boolean {
 
 export function StyleAnalysisScreen() {
   const { user } = useAuth();
-  const userId = user?.id ?? null;
+  const consultantAuthId = user?.id ?? null;
 
   const [step, setStep] = useState<Step>(0);
   const [answers, setAnswers] = useState<QuestionnaireFormState>({});
+  const [clientDisplayName, setClientDisplayName] = useState('');
   const [report, setReport] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
@@ -163,14 +165,15 @@ export function StyleAnalysisScreen() {
     let cancelled = false;
 
     async function restore() {
-      if (!userId) {
+      if (!consultantAuthId) {
         setRestoredFromStorage(true);
         return;
       }
-      const saved = await loadStyleAnalysis(userId);
+      const saved = await loadStyleAnalysis(consultantAuthId);
       if (cancelled) return;
       if (saved) {
         setStep(saved.step);
+        setClientDisplayName(saved.clientDisplayName ?? '');
         setAnswers(saved.answers);
         setReport(saved.report);
       }
@@ -181,16 +184,28 @@ export function StyleAnalysisScreen() {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [consultantAuthId]);
 
   useEffect(() => {
-    if (!userId || !restoredFromStorage) return;
+    if (!consultantAuthId || !restoredFromStorage) return;
     const handle = setTimeout(() => {
-      void saveStyleAnalysis(userId, { step, answers, report });
+      void saveStyleAnalysis(consultantAuthId, { step, clientDisplayName, answers, report });
     }, 500);
     return () => clearTimeout(handle);
-  }, [userId, restoredFromStorage, step, answers, report]);
+  }, [consultantAuthId, restoredFromStorage, step, clientDisplayName, answers, report]);
 
+  function reportForLabel(): string {
+    const t = clientDisplayName.trim();
+    return t.length > 0 ? t : 'Client';
+  }
+
+  function validateClientNameForReport(): boolean {
+    if (clientDisplayName.trim().length === 0) {
+      Alert.alert('Client name needed', 'Enter your client’s name (or a short label). It appears on the exported report.');
+      return false;
+    }
+    return true;
+  }
   function setAnswer<K extends keyof QuestionnaireFormState>(key: K, value: QuestionnaireFormState[K]) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   }
@@ -267,13 +282,17 @@ export function StyleAnalysisScreen() {
       return;
     }
 
+    if (!validateClientNameForReport()) {
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const data = buildQuestionnaireData();
       const generated = generateLogicBasedReport(data);
       setReport(generated);
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Could not generate your report.';
+      const message = e instanceof Error ? e.message : 'Could not generate this client report.';
       Alert.alert('Error', message);
     } finally {
       setIsGenerating(false);
@@ -294,7 +313,7 @@ export function StyleAnalysisScreen() {
       .replace(/'/g, '&#39;');
   }
 
-  function buildPdfHtml(reportText: string): string {
+  function buildPdfHtml(reportText: string, preparedForLabel: string): string {
     const reportLines = reportText.split('\n').map((line) => line.trim());
     let contentHtml = '';
 
@@ -324,7 +343,8 @@ export function StyleAnalysisScreen() {
     <meta charset="utf-8" />
     <style>
       body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #1e293b; padding: 24px; line-height: 1.6; }
-      h1 { font-size: 24px; margin: 0 0 16px 0; color: #6366f1; }
+      h1 { font-size: 24px; margin: 0 0 8px 0; color: #6366f1; }
+      .meta-report { font-size: 15px; color: #334155; margin: 0 0 14px 0; font-weight: 600; }
       h2 { font-size: 16px; margin: 14px 0 6px 0; color: #6366f1; }
       p { margin: 0 0 6px 0; white-space: normal; font-size: 13px; }
       p.bullet { margin-left: 14px; }
@@ -335,7 +355,8 @@ export function StyleAnalysisScreen() {
     </style>
   </head>
   <body>
-    <h1>Your Style Report</h1>
+    <h1>Style Report</h1>
+    <p class="meta-report">${escapeHtml(`Report for: ${preparedForLabel}`)}</p>
     ${contentHtml}
     <p class="closing">${escapeHtml(
       'Now you know exactly what works for you. If Styla delivered — tell someone. Leave a review on Google Play and help another woman stop guessing.',
@@ -349,7 +370,7 @@ export function StyleAnalysisScreen() {
     setIsDownloadingPdf(true);
     try {
       const { uri } = await Print.printToFileAsync({
-        html: buildPdfHtml(report),
+        html: buildPdfHtml(report, reportForLabel()),
       });
       const sourceFile = new File(uri);
       // Unique name so repeat downloads don’t fail when the previous PDF still exists in cache.
@@ -358,16 +379,16 @@ export function StyleAnalysisScreen() {
       const targetUri = targetFile.uri;
       const sharingAvailable = await Sharing.isAvailableAsync();
       if (!sharingAvailable) {
-        Alert.alert('PDF ready', `Your PDF was created at:\n${targetUri}`);
+        Alert.alert('PDF ready', `The client report PDF was created at:\n${targetUri}`);
         return;
       }
       await Sharing.shareAsync(targetUri, {
         mimeType: 'application/pdf',
-        dialogTitle: 'Download your style report PDF',
+        dialogTitle: 'Share client PDF',
         UTI: '.pdf',
       });
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Could not download your PDF.';
+      const message = e instanceof Error ? e.message : 'Could not create the client PDF.';
       Alert.alert('PDF error', message);
     } finally {
       setIsDownloadingPdf(false);
@@ -384,9 +405,10 @@ export function StyleAnalysisScreen() {
   if (report) {
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.reportTitle}>Your Style Report</Text>
+        <Text style={styles.reportTitle}>Style report</Text>
+        <Text style={styles.reportClientLine}>Report for: {reportForLabel()}</Text>
         <Text style={styles.reportIntro}>
-          Based on your answers, here’s your style analysis report.
+          Based on the observations and answers you captured for this client, here is the style analysis.
         </Text>
 
         <Pressable
@@ -399,7 +421,7 @@ export function StyleAnalysisScreen() {
           disabled={isDownloadingPdf}
         >
           <Text style={styles.primaryButtonText}>
-            {isDownloadingPdf ? 'Preparing PDF…' : 'Download PDF'}
+            {isDownloadingPdf ? 'Preparing PDF…' : 'Download client PDF'}
           </Text>
         </Pressable>
 
@@ -467,7 +489,7 @@ export function StyleAnalysisScreen() {
           disabled={isDownloadingPdf}
         >
           <Text style={styles.primaryButtonText}>
-            {isDownloadingPdf ? 'Preparing PDF…' : 'Download PDF'}
+            {isDownloadingPdf ? 'Preparing PDF…' : 'Download client PDF'}
           </Text>
         </Pressable>
 
@@ -490,8 +512,23 @@ export function StyleAnalysisScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Style analysis</Text>
-      <Text style={styles.body}>Answer a few questions to get personalised styling guidance. </Text>
+      <Text style={styles.title}>Client style report</Text>
+      <Text style={styles.body}>
+        Work through this questionnaire on behalf of your client. The narrative in the final report stays warm and
+        personal for her; your job here is to record accurate line, scale, and body-shape details.
+      </Text>
+
+      <Text style={styles.clientNameLabel}>Client name</Text>
+      <TextInput
+        style={styles.clientNameInput}
+        value={clientDisplayName}
+        onChangeText={setClientDisplayName}
+        placeholder="Shown on the exported report"
+        placeholderTextColor="rgba(148,163,184,0.75)"
+        editable={!report}
+        autoCapitalize="words"
+      />
+      <Text style={styles.clientNameHint}>Required before you generate the PDF.</Text>
 
       <View style={styles.progressShell}>
         <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
@@ -500,8 +537,8 @@ export function StyleAnalysisScreen() {
       <Text style={styles.stepTitle}>{stepTitles[step]}</Text>
       {step === 3 ? (
         <Text style={[styles.questionHint, styles.stepHint]}>
-          In front of a full length mirror, wearing something you can clearly see your shape in, hold
-          the metre stick beside your shoulder and let it drop downwards.
+          In front of a full-length mirror, your client should wear something you can clearly see her shape in. Hold
+          the metre stick beside her shoulder and let it drop straight down.
         </Text>
       ) : null}
 
@@ -577,7 +614,7 @@ export function StyleAnalysisScreen() {
         <View style={styles.stepBlock}>
           <Text style={styles.questionLabel}>Wrist Circumference</Text>
           <Text style={styles.questionHint}>
-            Measure the diameter of the smallest part of your wrist
+            Have the client measure the diameter of the smallest part of her wrist, or help her measure it.
           </Text>
           <View style={styles.chipRow}>
             {scaleOptions.wrist.map((opt) => (
@@ -652,7 +689,7 @@ export function StyleAnalysisScreen() {
           disabled={isGenerating}
         >
           <Text style={styles.primaryButtonText}>
-            {isGenerating ? 'Generating…' : step < 3 ? 'Next' : 'Proceed to get report'}
+            {isGenerating ? 'Generating…' : step < 3 ? 'Next' : 'Generate client report'}
           </Text>
         </Pressable>
       </View>
@@ -849,6 +886,34 @@ const styles = StyleSheet.create({
     fontSize: 23,
     fontWeight: '900',
     marginTop: 6,
+  },
+  reportClientLine: {
+    color: '#e2e8f0',
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  clientNameLabel: {
+    marginTop: 16,
+    color: 'rgba(248,250,252,0.9)',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  clientNameInput: {
+    marginTop: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(148,163,184,0.4)',
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    fontSize: 15,
+    color: '#f8fafc',
+    backgroundColor: 'rgba(15,23,42,0.6)',
+  },
+  clientNameHint: {
+    marginTop: 6,
+    color: '#94a3b8',
+    fontSize: 12,
   },
   reportIntro: {
     color: '#cbd5e1',

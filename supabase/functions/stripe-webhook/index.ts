@@ -1,3 +1,7 @@
+/**
+ * Stripe → Supabase sync. Configure `verify_jwt = false` in supabase/config.toml.
+ * Requires a UNIQUE constraint on `public.subscriptions (consultant_id)` for checkout upserts.
+ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import Stripe from 'https://esm.sh/stripe@17.4.0';
 

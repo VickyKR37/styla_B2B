@@ -3,21 +3,21 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import type { RootStackParamList } from '../../App';
 import { useAuth } from '../../context/AuthContext';
-import { usePaymentAccess } from '../../context/PaymentAccessContext';
+import { useSubscription } from '../hooks/useSubscription';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export function HomeScreen({ navigation }: Props) {
   const { signOut } = useAuth();
-  const { hasStyleAccess, loading } = usePaymentAccess();
+  const { isActive, loading } = useSubscription();
 
   function openStyleAnalysis() {
     if (loading) return;
-    if (hasStyleAccess) {
+    if (isActive) {
       navigation.navigate('StyleAnalysis');
       return;
     }
-    navigation.navigate('Payment');
+    navigation.navigate('Subscription');
   }
 
   return (
@@ -43,15 +43,19 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={styles.cardBody}>View and manage your saved clients and attach colour-season PDF reports.</Text>
         </Pressable>
 
+        <Pressable style={styles.cardMuted} onPress={() => navigation.navigate('Subscription')}>
+          <Text style={styles.cardTitle}>Subscription</Text>
+          <Text style={styles.cardBody}>Manage your £19.99/month unlimited-reports subscription and billing.</Text>
+        </Pressable>
+
         <Pressable style={styles.card} onPress={openStyleAnalysis}>
           <Text style={styles.cardTitle}>New client style report</Text>
           <Text style={styles.cardBody}>
-            This analysis is meant for women clients only. Run through the steps with your client present (or capture
-            verified details on her behalf). Your client will need a full-length mirror, a measuring tape, a straight
-            long stick (such as a metre stick), and fitted clothing that lets you see her shape clearly. Answers
-            lock in after the report is generated—you can’t edit them afterward, so double-check before proceeding.
+            This analysis is meant for women clients only. Run through the style analysis with your client present and capture
+            her details. Then, enter the results into the questionnaire in this app and receive her approx. 800 word report.
+            Answers lock in after the report is generated—you can't edit them afterwards, so double-check before proceeding.
           </Text>
-          <Text style={styles.priceTag}>Professional access — £19.99</Text>
+          <Text style={styles.priceTag}>Unlimited reports — subscription £19.99/month</Text>
         </Pressable>
       </ScrollView>
     </View>

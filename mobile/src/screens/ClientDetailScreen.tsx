@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Tex
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import type { RootStackParamList } from '../../App';
+import { useSubscription } from '../hooks/useSubscription';
 import { openReportPdfWithFreshUrl } from '../lib/openReportPdf';
 import { supabase } from '../../lib/supabase';
 import type { ClientRow, ReportRow } from '../types/clients';
@@ -13,6 +14,7 @@ type ReportLite = Pick<ReportRow, 'id' | 'colour_season' | 'created_at' | 'pdf_u
 
 export function ClientDetailScreen({ navigation, route }: Props) {
   const { clientId } = route.params;
+  const { isActive: subActive, loading: subLoading } = useSubscription();
   const [client, setClient] = useState<Pick<ClientRow, 'id' | 'full_name'> | null>(null);
   const [reports, setReports] = useState<ReportLite[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,6 +132,18 @@ export function ClientDetailScreen({ navigation, route }: Props) {
         </Pressable>
       ) : null}
 
+      {!subLoading && !subActive ? (
+        <View style={styles.subscribeBanner}>
+          <Text style={styles.subscribeTitle}>Subscription required</Text>
+          <Text style={styles.subscribeBody}>
+            An active Styla subscription is required to add new reports. Subscribe for £19.99/month with unlimited reports.
+          </Text>
+          <Pressable style={styles.subscribeBtn} onPress={() => navigation.navigate('Subscription')}>
+            <Text style={styles.subscribeBtnText}>View subscription</Text>
+          </Pressable>
+        </View>
+      ) : null}
+
       <View style={styles.headerBlock}>
         <Text style={styles.clientName}>
           {client?.full_name?.trim() ? client.full_name.trim() : 'Unnamed client'}
@@ -242,4 +256,24 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   fabText: { color: '#0b1220', fontWeight: '800', fontSize: 15 },
+  fabDisabled: { opacity: 0.45 },
+  subscribeBanner: {
+    marginHorizontal: 12,
+    marginTop: 8,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: 'rgba(196,149,106,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(196,149,106,0.35)',
+  },
+  subscribeTitle: { color: '#f8fafc', fontWeight: '800', fontSize: 16, marginBottom: 6 },
+  subscribeBody: { color: '#cbd5e1', fontSize: 13, lineHeight: 18, marginBottom: 12 },
+  subscribeBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#C4956A',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  subscribeBtnText: { color: '#0b1220', fontWeight: '800', fontSize: 14 },
 });

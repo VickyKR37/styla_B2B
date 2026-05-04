@@ -1,39 +1,53 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, type LinkingOptions } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
+import * as WebBrowser from 'expo-web-browser';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { PaymentAccessProvider } from './context/PaymentAccessContext';
 import { navigationRef } from './navigationRef';
 import { LoginScreen } from './screens/auth/LoginScreen';
 import { SignupScreen } from './screens/auth/SignupScreen';
+
+export type { AuthStackParamList, RootStackParamList } from './navigationParamLists';
+import type { AuthStackParamList, CombinedNavigationParamList, RootStackParamList } from './navigationParamLists';
+
 import { LegalLinksFooter } from './src/components/LegalLinksFooter';
 import { AboutScreen } from './src/screens/AboutScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
-import { PaymentScreen } from './src/screens/PaymentScreen';
+import { SubscriptionScreen } from './src/screens/SubscriptionScreen';
+import { SubscriptionResultScreen } from './src/screens/SubscriptionResultScreen';
 import { AddClientScreen } from './src/screens/AddClientScreen';
 import { AddReportScreen } from './src/screens/AddReportScreen';
 import { ClientDetailScreen } from './src/screens/ClientDetailScreen';
 import { ClientListScreen } from './src/screens/ClientListScreen';
 import { StyleAnalysisScreen } from './src/screens/StyleAnalysisScreen';
 
-export type RootStackParamList = {
-  Home: undefined;
-  About: undefined;
-  StyleAnalysis: undefined;
-  Payment: undefined;
-  ClientList: undefined;
-  AddClient: undefined;
-  ClientDetail: { clientId: string };
-  AddReport: { clientId: string };
-};
-
-export type AuthStackParamList = {
-  Login: undefined;
-  Signup: undefined;
-  About: undefined;
+const linking: LinkingOptions<CombinedNavigationParamList> = {
+  prefixes: ['styla://', Linking.createURL('/')],
+  config: {
+    screens: {
+      Login: 'login',
+      Signup: 'signup',
+      Home: '',
+      About: 'about',
+      StyleAnalysis: 'style-analysis',
+      Subscription: 'subscription/manage',
+      SubscriptionResult: 'subscription/result',
+      ClientList: 'clients',
+      AddClient: 'clients/new',
+      ClientDetail: {
+        path: 'clients/:clientId',
+        parse: { clientId: (clientId: string) => decodeURIComponent(clientId) },
+      },
+      AddReport: {
+        path: 'clients/:clientId/reports/new',
+        parse: { clientId: (clientId: string) => decodeURIComponent(clientId) },
+      },
+    },
+  },
 };
 
 const AppStack = createNativeStackNavigator<RootStackParamList>();
@@ -64,7 +78,12 @@ function AppNavigator() {
         component={StyleAnalysisScreen}
         options={{ title: 'Client style report' }}
       />
-      <AppStack.Screen name="Payment" component={PaymentScreen} options={{ title: 'Billing' }} />
+      <AppStack.Screen name="Subscription" component={SubscriptionScreen} options={{ title: 'Subscription' }} />
+      <AppStack.Screen
+        name="SubscriptionResult"
+        component={SubscriptionResultScreen}
+        options={{ title: 'Confirming subscription', headerRight: () => null }}
+      />
       <AppStack.Screen name="ClientList" component={ClientListScreen} options={{ title: 'My clients' }} />
       <AppStack.Screen name="AddClient" component={AddClientScreen} options={{ title: 'New client' }} />
       <AppStack.Screen name="ClientDetail" component={ClientDetailScreen} options={{ title: 'Client' }} />
@@ -104,22 +123,23 @@ function RootNavigation() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>{session ? <AppNavigator /> : <AuthNavigator />}</NavigationContainer>
+    <NavigationContainer linking={linking} ref={navigationRef}>
+      {session ? <AppNavigator /> : <AuthNavigator />}
+    </NavigationContainer>
   );
 }
 
 export default function App() {
+  WebBrowser.maybeCompleteAuthSession();
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <PaymentAccessProvider>
-          <View style={styles.appShell}>
-            <View style={styles.navigationShell}>
-              <RootNavigation />
-            </View>
-            <LegalLinksFooter />
+        <View style={styles.appShell}>
+          <View style={styles.navigationShell}>
+            <RootNavigation />
           </View>
-        </PaymentAccessProvider>
+          <LegalLinksFooter />
+        </View>
       </AuthProvider>
       <StatusBar style="auto" />
     </SafeAreaProvider>

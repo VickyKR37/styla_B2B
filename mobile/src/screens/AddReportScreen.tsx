@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import type { RootStackParamList } from '../../App';
+import { useSubscription } from '../hooks/useSubscription';
 import { supabase } from '../../lib/supabase';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddReport'>;
@@ -21,6 +22,7 @@ function newRandomFileName(): string {
 
 export function AddReportScreen({ navigation, route }: Props) {
   const { clientId } = route.params;
+  const { isActive: subActive, loading: subLoading } = useSubscription();
   const reportIdRef = useRef<string | null>(null);
   const colourSeasonRef = useRef('');
   const pdfPathRef = useRef<string | null>(null);
@@ -42,6 +44,13 @@ export function AddReportScreen({ navigation, route }: Props) {
   pdfPathRef.current = pdfPath;
 
   useEffect(() => {
+    if (!subLoading && !subActive) {
+      setBootLoading(false);
+    }
+  }, [subLoading, subActive]);
+
+  useEffect(() => {
+    if (subLoading || !subActive) return;
     let cancelled = false;
 
     async function insertBlankReport(): Promise<void> {
@@ -92,7 +101,7 @@ export function AddReportScreen({ navigation, route }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [clientId]);
+  }, [clientId, subLoading, subActive]);
 
   useEffect(() => {
     if (!reportId) return;
@@ -232,6 +241,32 @@ export function AddReportScreen({ navigation, route }: Props) {
     return '';
   }, [saveMessage, saveStatus]);
 
+  if (subLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator color="#C4956A" size="large" />
+        <Text style={styles.muted}>Checking subscription…</Text>
+      </View>
+    );
+  }
+
+  if (!subActive) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.gateTitle}>Subscription required</Text>
+        <Text style={styles.gateBody}>
+          An active Styla subscription (£19.99/month, unlimited reports) is required to create reports.
+        </Text>
+        <Pressable style={styles.gateBtn} onPress={() => navigation.navigate('Subscription')}>
+          <Text style={styles.gateBtnText}>View subscription</Text>
+        </Pressable>
+        <Pressable style={styles.retry} onPress={() => navigation.goBack()}>
+          <Text style={styles.retryText}>Go back</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   if (bootLoading) {
     return (
       <View style={styles.centered}>
@@ -294,6 +329,23 @@ const styles = StyleSheet.create({
   shell: { flex: 1, backgroundColor: '#0b1220' },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#0b1220' },
   muted: { color: '#94a3b8', marginTop: 12 },
+  gateTitle: { color: '#f8fafc', fontSize: 20, fontWeight: '800', marginBottom: 10, textAlign: 'center' },
+  gateBody: {
+    color: '#94a3b8',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    marginBottom: 18,
+    paddingHorizontal: 8,
+  },
+  gateBtn: {
+    backgroundColor: '#C4956A',
+    paddingVertical: 12,
+    paddingHorizontal: 22,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  gateBtnText: { color: '#0b1220', fontWeight: '800', fontSize: 15 },
   error: { color: '#fecaca', textAlign: 'center', marginBottom: 16 },
   retry: { padding: 12 },
   retryText: { color: '#C4956A', fontWeight: '700' },

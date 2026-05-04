@@ -1,20 +1,11 @@
 import { createNavigationContainerRef } from '@react-navigation/native';
 
-/** Combined routes for the single NavigationContainer (auth or app stack mounted). */
-export type RootNavigationParamList = {
-  Login: undefined;
-  Signup: undefined;
-  About: undefined;
-  Home: undefined;
-  StyleAnalysis: undefined;
-  Payment: undefined;
-  ClientList: undefined;
-  AddClient: undefined;
-  ClientDetail: { clientId: string };
-  AddReport: { clientId: string };
-};
+import type { CombinedNavigationParamList } from './navigationParamLists';
 
-export const navigationRef = createNavigationContainerRef<RootNavigationParamList>();
+/** Covers both authenticated app stack and auth stack when calling `navigationRef.navigate()`. */
+export type RootNavigationParamList = CombinedNavigationParamList;
+
+export const navigationRef = createNavigationContainerRef<CombinedNavigationParamList>();
 
 export function navigateToAbout() {
   if (navigationRef.isReady()) {
